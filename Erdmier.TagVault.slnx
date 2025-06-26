@@ -1,0 +1,8 @@
+﻿<Solution>
+  <Folder Name="/SolutionItems/">
+    <File Path=".gitignore" />
+  </Folder>
+  <Folder Name="/Source/">
+    <Project Path="Source\Domain\Domain.csproj" Type="Classic C#" />
+  </Folder>
+</Solution>
