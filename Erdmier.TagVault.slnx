@@ -4,5 +4,6 @@
   </Folder>
   <Folder Name="/Source/">
     <Project Path="Source\Domain\Domain.csproj" Type="Classic C#" />
+    <Project Path="Source\Persistence\Persistence.csproj" Type="Classic C#" />
   </Folder>
 </Solution>
