@@ -2,13 +2,9 @@
 
 public sealed class Tag : AggregateRootWithDomainEvents<TagId, Guid>
 {
-    private readonly List<string> _aliases = [];
+    private readonly List<Alias> _aliases = [];
 
     private readonly List<FileInfoId> _attachedFileInfoIds = [];
-
-    private readonly List<Tag> _children = [];
-
-    private readonly List<Tag> _parents = [];
 
     private Tag(string name, Guid ownerId, TagId? id = null)
         : base(id ?? TagId.Create())
@@ -17,9 +13,9 @@ public sealed class Tag : AggregateRootWithDomainEvents<TagId, Guid>
         OwnerId = ownerId;
     }
 
-    public IReadOnlyCollection<string> Aliases => _aliases.AsReadOnly();
+    public IReadOnlyCollection<Alias> Aliases => _aliases.AsReadOnly();
 
-    public IReadOnlyCollection<Tag> Children => _children.AsReadOnly();
+    public IReadOnlyCollection<FileInfoId> AttachedFileInfoIds => _attachedFileInfoIds.AsReadOnly();
 
     public Tag? DisambiguatingParent { get; set; }
 
@@ -31,18 +27,16 @@ public sealed class Tag : AggregateRootWithDomainEvents<TagId, Guid>
 
     public Guid OwnerId { get; set; }
 
-    public IReadOnlyCollection<Tag> Parents => _parents.AsReadOnly();
-
     public string? ShortName { get; set; }
 
-    public ErrorOr<Success> AddAlias(string aliasName)
+    public ErrorOr<Success> AddAlias(Alias alias)
     {
-        if (_aliases.Contains(aliasName))
+        if (_aliases.Contains(alias))
         {
-            return Errors.Tag.Aliases.AlreadyExists(aliasName);
+            return Errors.Tag.Aliases.AlreadyExists(alias.Name);
         }
 
-        _aliases.Add(aliasName);
+        _aliases.Add(alias);
 
         return Result.Success;
     }
@@ -59,38 +53,14 @@ public sealed class Tag : AggregateRootWithDomainEvents<TagId, Guid>
         return Result.Success;
     }
 
-    public ErrorOr<Success> AddChild(Tag child)
+    public ErrorOr<Deleted> RemoveAlias(Alias alias)
     {
-        if (_children.Contains(child))
+        if (!_aliases.Contains(alias))
         {
-            return Errors.Tag.ChildTags.AlreadyExists(child.Name, Name);
+            return Errors.Tag.Aliases.NotExists(alias.Name);
         }
 
-        _children.Add(child);
-
-        return Result.Success;
-    }
-
-    public ErrorOr<Success> AddParent(Tag parent)
-    {
-        if (_parents.Contains(parent))
-        {
-            return Errors.Tag.ParentTags.AlreadyExists(parent.Name, Name);
-        }
-
-        _parents.Add(parent);
-
-        return Result.Success;
-    }
-
-    public ErrorOr<Deleted> RemoveAlias(string aliasName)
-    {
-        if (!_aliases.Contains(aliasName))
-        {
-            return Errors.Tag.Aliases.NotExists(aliasName);
-        }
-
-        _aliases.Remove(aliasName);
+        _aliases.Remove(alias);
 
         return Result.Deleted;
     }
@@ -103,30 +73,6 @@ public sealed class Tag : AggregateRootWithDomainEvents<TagId, Guid>
         }
 
         _attachedFileInfoIds.Remove(fileInfoId);
-
-        return Result.Deleted;
-    }
-
-    public ErrorOr<Deleted> RemoveChild(Tag child)
-    {
-        if (!_children.Contains(child))
-        {
-            return Errors.Tag.ChildTags.NotExists(child.Name, Name);
-        }
-
-        _children.Remove(child);
-
-        return Result.Deleted;
-    }
-
-    public ErrorOr<Deleted> RemoveParent(Tag parent)
-    {
-        if (!_parents.Contains(parent))
-        {
-            return Errors.Tag.ParentTags.NotExists(parent.Name, Name);
-        }
-
-        _parents.Remove(parent);
 
         return Result.Deleted;
     }
