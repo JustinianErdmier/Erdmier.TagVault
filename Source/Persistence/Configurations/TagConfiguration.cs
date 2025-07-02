@@ -7,6 +7,7 @@ public sealed class TagConfiguration : IEntityTypeConfiguration<Tag>
         ConfigureTagsTable(builder);
         ConfigureTagAliasesTable(builder);
         ConfigureTagAttachedFileInfoIdsTable(builder);
+        ConfigureTagColorTable(builder);
     }
 
     private static void ConfigureTagsTable(EntityTypeBuilder<Tag> builder)
@@ -19,6 +20,10 @@ public sealed class TagConfiguration : IEntityTypeConfiguration<Tag>
                .ValueGeneratedNever()
                .HasConversion(id => id.Value,
                               value => TagId.Create(value));
+
+        builder.Property(t => t.DisambiguatingParentId)
+               .HasConversion(id => id       == null ? Guid.Empty : id.Value,
+                              value => value != Guid.Empty ? TagId.Create(value) : null);
 
         builder.Property(t => t.Name)
                .HasMaxLength(maxLength: 100)
@@ -42,12 +47,6 @@ public sealed class TagConfiguration : IEntityTypeConfiguration<Tag>
                                .HasForeignKey("TagId");
 
                              ab.HasKey("Id", "TagId");
-
-                             ab.Property(a => a.Id)
-                               .HasColumnName(name: "AliasId")
-                               .ValueGeneratedNever()
-                               .HasConversion(id => id.Value,
-                                              value => AliasId.Create(value));
 
                              ab.Property(a => a.Name)
                                .HasMaxLength(maxLength: 25);
@@ -75,5 +74,28 @@ public sealed class TagConfiguration : IEntityTypeConfiguration<Tag>
 
         builder.Metadata.FindNavigation(nameof(Tag.AttachedFileInfoIds))!
                .SetPropertyAccessMode(PropertyAccessMode.Field);
+    }
+
+    private static void ConfigureTagColorTable(EntityTypeBuilder<Tag> builder)
+    {
+        builder.OwnsOne(t => t.Color,
+                        cb =>
+                        {
+                            cb.ToTable(name: "TagColors");
+
+                            cb.WithOwner()
+                              .HasForeignKey("TagId");
+
+                            cb.HasKey("Id", "TagId");
+
+                            cb.Property(c => c.Fill)
+                              .HasMaxLength(maxLength: 7);
+
+                            cb.Property(c => c.Outline)
+                              .HasMaxLength(maxLength: 7);
+
+                            cb.Property(c => c.Text)
+                              .HasMaxLength(maxLength: 7);
+                        });
     }
 }

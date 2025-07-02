@@ -2,7 +2,7 @@
 
 public sealed class Tag : AggregateRootWithDomainEvents<TagId, Guid>
 {
-    private readonly List<Alias> _aliases = [];
+    private readonly List<TagAlias> _aliases = [];
 
     private readonly List<FileInfoId> _attachedFileInfoIds = [];
 
@@ -13,11 +13,13 @@ public sealed class Tag : AggregateRootWithDomainEvents<TagId, Guid>
         OwnerId = ownerId;
     }
 
-    public IReadOnlyCollection<Alias> Aliases => _aliases.AsReadOnly();
+    public IReadOnlyCollection<TagAlias> Aliases => _aliases.AsReadOnly();
 
     public IReadOnlyCollection<FileInfoId> AttachedFileInfoIds => _attachedFileInfoIds.AsReadOnly();
 
-    public Tag? DisambiguatingParent { get; set; }
+    public TagColor Color { get; set; } = TagColor.Default;
+
+    public TagId? DisambiguatingParentId { get; set; }
 
     public bool IsCategory { get; set; }
 
@@ -29,14 +31,14 @@ public sealed class Tag : AggregateRootWithDomainEvents<TagId, Guid>
 
     public string? ShortName { get; set; }
 
-    public ErrorOr<Success> AddAlias(Alias alias)
+    public ErrorOr<Success> AddAlias(TagAlias tagAlias)
     {
-        if (_aliases.Contains(alias))
+        if (_aliases.Contains(tagAlias))
         {
-            return Errors.Tag.Aliases.AlreadyExists(alias.Name);
+            return Errors.Tag.Aliases.AlreadyExists(tagAlias.Name);
         }
 
-        _aliases.Add(alias);
+        _aliases.Add(tagAlias);
 
         return Result.Success;
     }
@@ -53,14 +55,14 @@ public sealed class Tag : AggregateRootWithDomainEvents<TagId, Guid>
         return Result.Success;
     }
 
-    public ErrorOr<Deleted> RemoveAlias(Alias alias)
+    public ErrorOr<Deleted> RemoveAlias(TagAlias tagAlias)
     {
-        if (!_aliases.Contains(alias))
+        if (!_aliases.Contains(tagAlias))
         {
-            return Errors.Tag.Aliases.NotExists(alias.Name);
+            return Errors.Tag.Aliases.NotExists(tagAlias.Name);
         }
 
-        _aliases.Remove(alias);
+        _aliases.Remove(tagAlias);
 
         return Result.Deleted;
     }

@@ -3,6 +3,7 @@
     <File Path=".gitignore" />
   </Folder>
   <Folder Name="/Source/">
+    <Project Path="Source\Application\Application.csproj" Type="Classic C#" />
     <Project Path="Source\Domain\Domain.csproj" Type="Classic C#" />
     <Project Path="Source\Persistence\Persistence.csproj" Type="Classic C#" />
   </Folder>
