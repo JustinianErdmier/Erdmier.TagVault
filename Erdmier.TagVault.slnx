@@ -6,5 +6,6 @@
     <Project Path="Source\Application\Application.csproj" Type="Classic C#" />
     <Project Path="Source\Domain\Domain.csproj" Type="Classic C#" />
     <Project Path="Source\Persistence\Persistence.csproj" Type="Classic C#" />
+    <Project Path="Source\Presentation.Shared\Presentation.Shared.csproj" Type="Classic C#" />
   </Folder>
 </Solution>

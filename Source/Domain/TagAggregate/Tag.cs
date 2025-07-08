@@ -17,13 +17,11 @@ public sealed class Tag : AggregateRootWithDomainEvents<TagId, Guid>
 
     public IReadOnlyCollection<FileInfoId> AttachedFileInfoIds => _attachedFileInfoIds.AsReadOnly();
 
-    public TagColor Color { get; set; } = TagColor.Default;
+    // public TagColor Color { get; set; } = TagColor.Default;
 
     public TagId? DisambiguatingParentId { get; set; }
 
     public bool IsCategory { get; set; }
-
-    public bool IsUsedBySystem { get; }
 
     public string Name { get; set; }
 
